@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import express, { Express, Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import { connectToDatabase } from './src/connections/mongodb'
+import { User } from './src/models/user.model'
 
 // import { userRouter } from './src/routes/user.routes'
 
@@ -27,8 +28,20 @@ app.get('/', async (req: Request, res: Response): Promise<Response> => {
 
 app.post('/register', (req, res) => {
     const { username, password } = req.body
-    bcrypt.hash()
-    return res.json({'username': username, 'password': password, 'fuck': 'fuck'})
+    bcrypt.hash(password, 10).then((hash) => {
+        User.create({
+            username: username,
+            password: hash
+        }).then(() => {
+            res.json(username + ' REGISTERED')
+        }).catch((err) => {
+            if (err) {
+                console.log('here')
+                res.status(400).json({ error: err})
+            }
+        })
+    })
+    // return res.json({'username': username, 'password': password, 'fuck': 'fuck'})
 })
 
 try{

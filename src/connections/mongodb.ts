@@ -1,4 +1,5 @@
 import mongoose, { ConnectOptions } from 'mongoose'
+import { User } from '../models/user.model'
 
 export const connectToDatabase = async (dbUri: string) => {
   console.log(dbUri)
@@ -10,6 +11,7 @@ export const connectToDatabase = async (dbUri: string) => {
   }
   try {
     await mongoose.connect(dbUri, options)
+    User.collection.createIndex({ username: 1 }, { unique: true })
   } catch (error: any) {
     throw new Error(`Mongodb connection failed: ${error}`)
   }
