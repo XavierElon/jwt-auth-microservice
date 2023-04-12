@@ -25,6 +25,11 @@ app.use(cors())
 app.use(cookieParser())
 // app.use(userRouter)
 
+app.use((req, res, next) => {
+    console.log('Middleware called')
+    next()
+})
+
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).send({ message: 'JWT' })
 })
