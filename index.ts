@@ -21,7 +21,7 @@ app.use(cors())
 app.use(userRouter)
 
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
-    return res.status(200).send({ message: 'Achilles' })
+    return res.status(200).send({ message: 'JWT' })
 })
 
 try{
