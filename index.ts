@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 import cookieParser from 'cookie-parser'
 import { connectToDatabase } from './src/connections/mongodb'
 import { User } from './src/models/user.model'
-import { createTokens } from './jwt'
+import { createTokens, validateToken } from './jwt'
 
 // import { userRouter } from './src/routes/user.routes'
 
@@ -63,12 +63,17 @@ app.post('/login', async (req: Request, res: Response) => {
         } else {
             const accessToken = createTokens(user)
             res.cookie('access-token', accessToken, {
-                maxAge: 60 * 60 * 1000
+                maxAge: 60 * 60 * 1000,
+                httpOnly: true
             })
             res.json('Logged in')
         }
 
     })
+})
+
+app.get('/profile', validateToken, (req, res) => {
+    res.json('profile')
 })
 
 try{
