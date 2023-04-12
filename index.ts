@@ -2,8 +2,10 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express, { Express, Request, Response } from 'express'
 import bcrypt from 'bcrypt'
+import cookieParser from 'cookie-parser'
 import { connectToDatabase } from './src/connections/mongodb'
 import { User } from './src/models/user.model'
+import { createTokens } from './jwt'
 
 // import { userRouter } from './src/routes/user.routes'
 
@@ -20,6 +22,7 @@ const UriQueryParam: string = process.env.QUERY_PARAMETERS || ''
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.use(cookieParser())
 // app.use(userRouter)
 
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
@@ -47,17 +50,21 @@ app.post('/register', (req, res) => {
 app.post('/login', async (req: Request, res: Response) => {
     const { username, password } = req.body
 
-    const existingUser = await User.findOne({ username })
-    if (!existingUser) {
+    const user = await User.findOne({ username })
+    if (!user) {
         console.log('user does not exist')
         res.status(400).json({ error: 'User does not exist'})
     }
-    const dbPassword = existingUser?.password
+    const dbPassword = user?.password
 
     bcrypt.compare(password, dbPassword).then((match) => {
         if (!match) {
             res.status(400).json({ error: 'Wrong password or username'})
         } else {
+            const accessToken = createTokens(user)
+            res.cookie('access-token', accessToken, {
+                maxAge: 60 * 60 * 1000
+            })
             res.json('Logged in')
         }
 
