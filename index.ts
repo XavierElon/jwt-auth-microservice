@@ -44,6 +44,26 @@ app.post('/register', (req, res) => {
     // return res.json({'username': username, 'password': password, 'fuck': 'fuck'})
 })
 
+app.post('/login', async (req: Request, res: Response) => {
+    const { username, password } = req.body
+
+    const existingUser = await User.findOne({ username })
+    if (!existingUser) {
+        console.log('user does not exist')
+        res.status(400).json({ error: 'User does not exist'})
+    }
+    const dbPassword = existingUser?.password
+
+    bcrypt.compare(password, dbPassword).then((match) => {
+        if (!match) {
+            res.status(400).json({ error: 'Wrong password or username'})
+        } else {
+            res.json('Logged in')
+        }
+
+    })
+})
+
 try{
     app.listen(port, (): void => {
         /* eslint-disable no-console */
