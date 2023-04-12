@@ -1,9 +1,10 @@
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express, { Express, Request, Response } from 'express'
+import bcrypt from 'bcrypt'
 import { connectToDatabase } from './src/connections/mongodb'
 
-import { userRouter } from './src/routes/user.routes'
+// import { userRouter } from './src/routes/user.routes'
 
 dotenv.config()
 
@@ -18,10 +19,16 @@ const UriQueryParam: string = process.env.QUERY_PARAMETERS || ''
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
-app.use(userRouter)
+// app.use(userRouter)
 
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).send({ message: 'JWT' })
+})
+
+app.post('/register', (req, res) => {
+    const { username, password } = req.body
+    bcrypt.hash()
+    return res.json({'username': username, 'password': password, 'fuck': 'fuck'})
 })
 
 try{
